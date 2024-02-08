@@ -1,3 +1,9 @@
+// Michael Arturo Contreras Gilpin - 23310174 - 2P
+
+// Código funcionando, exceptuando por la opción de amamantar en los mamiferos, no logro poner la
+// condición de "crias == true", no se si se debe a que esta mal la función de "obtenerCrias()",
+// apreciaría si me explica a que se debe profesor, gracias.
+
 // Apartado de librerias
 #include <iostream>
 #include <locale>
@@ -18,7 +24,9 @@ class Animal {
     // Atributos necesarios en funciones de subclases
     protected:
         bool genero;
-        bool crias = false;  
+        float posicionX = 0;
+        float posicionY = 0; 
+        bool crias = false;
     public:
     // Constructor de la clase animal
     Animal(int NumPatas, float Peso, float Altura, float Velocidad, bool Genero)
@@ -45,11 +53,15 @@ class Animal {
         if (exitoReproduccion == 0)
         {
             cout << "\nEl animal ha encontrado una pareja para reproducirse." << endl;
-            crias = true; // En caso de éxito, se le asigna un atributo nuevo
+            crias = true; // En caso de éxito, se le asigna un atributo nuevo;
         }
         else { // En caso de que el randomizador genere el caso de fallo, el animal no se reproducirá
             cout << "\nEl animal no ha encontrado una pareja." << endl;
         }
+    }
+
+    bool obtenerCrias() const {
+        return crias;
     }
 
     void moverse() { // Método destinado a la capacidad de moverse del animal
@@ -58,23 +70,23 @@ class Animal {
 
         // Se genera un número aleatorio del movimiento en posiciones x, y directamente proporcional a 
         // la velocidad del animal
-        float posicionX = static_cast<float>(rand()) / RAND_MAX * velocidad;
-        float posicionY = static_cast<float>(rand()) / RAND_MAX * velocidad;
+        float nuevaPosicionX = static_cast<float>(rand()) / RAND_MAX * velocidad;
+        float nuevaPosicionY = static_cast<float>(rand()) / RAND_MAX * velocidad;
 
         // Se le da la oportunidad de que el animal pueda dirigirse para atras, como para adelante
         int direccionX = rand() % 2;
         if (direccionX == 1){
-            posicionX = -posicionX;
+            nuevaPosicionX = -nuevaPosicionX;
         }
 
         int direccionY = rand() % 2;
         if (direccionY == 1){
-            posicionY = -posicionY;
+            nuevaPosicionY = -nuevaPosicionY;
         }
 
         // Se actualiza la posición del animal
-        posicionX++;
-        posicionY++;
+        posicionX = posicionX + nuevaPosicionX;
+        posicionY = posicionY + nuevaPosicionY;
 
         cout << "\nEl animal se movi" << Oacento << " hacia la posici" << Oacento << "n (";
         cout << posicionX << ", " << posicionY << ") en un lapso de una hora." << endl;
@@ -95,15 +107,7 @@ class Mamifero : public Animal {
     }
 
     void amamantando() { // Método que le da al mamífero, la oportunidad de amamantar a sus crias
-
-        // Si el animal se reprodujo con éxito, y ademas es una hembra, podrá amamantar        
-        if (crias && genero == true) {
-
-            setlocale (LC_ALL, ""); // Apoyo de carácteres especiales de Unicode
-            char Oacento = 243; 
-            
-            cout << "\nEl animal amamant" << Oacento << " a sus crias." << endl;
-        }
+        cout << "\nEl animal esta amamantando a sus crias." << endl;
     }
 };
 
@@ -127,7 +131,7 @@ class Reptil : public Animal {
         if (muda == 0) {
             cout << "\nEl reptil mudo de piel." << endl;
         }
-        else { // En caso de que el randomizador genere el caso de fallo, el reptil no mudara
+        else { // En caso de que el randomizador genere el caso de fallo, el reptil no mudará
             cout << "\nEl reptil no necesita mudar." << endl;
         }
     }
@@ -135,6 +139,7 @@ class Reptil : public Animal {
 
 int main (void) {
     setlocale (LC_ALL, ""); // Apoyo de carácteres especiales de Unicode
+    char Aacento = 225;
     char Eacento = 233;
     char Oacento = 243; 
     char Iacento = 237; 
@@ -142,6 +147,8 @@ int main (void) {
 
     int eleccionCrear;
     int eleccionFinal;
+    int eleccionReptil;
+    int eleccionMamifero;
     
     // Menú de selección
     cout << "\nBienvenido, eliga una opci" << Oacento << "n: " << endl;
@@ -179,7 +186,9 @@ int main (void) {
         generoA = false;
     }
 
-    Animal* animal; // Puntero para la clase animal
+    Animal* animal;      // Actualmente funciona el código, pero no se por que me sale la alerta
+    Mamifero* mamifero;  // en la parte de recurrir a las funciones de los mamiferos y reptiles,
+    Reptil* reptil;      // se que se debe a los punteros, pero no entiendo por que.
 
     switch (eleccionCrear) { // Se crea la subclase, dependiendo la selección del usuario
         case 1:
@@ -188,8 +197,6 @@ int main (void) {
         case 2:
             animal = new Reptil(patasA, pesoA, alturaA, velocidadA, generoA);
             break;
-        default:
-            NULL;
     }
     
     bool i = true;
@@ -219,7 +226,65 @@ int main (void) {
             break;
 
             case 4:
-            cout << "\nAun no disponible." << endl;
+            if (eleccionCrear == 1) {
+                bool a = true; // Variable que mantiene el ciclo de los menús personalizados
+                while (a == true) { // Menu personalizado de la subclase Mamífero
+                    cout << "\n1. Cazar." << endl;
+                    cout << "2. Amamantar a las crias." << endl;
+                    cout << "3. Regresar al men" << Uacento << "." << endl;
+                    cin >> eleccionMamifero;
+
+                    switch (eleccionMamifero) {
+                        case 1:
+                        mamifero->cazar(); 
+                        break;
+
+                        case 2:
+                        animal->obtenerCrias(); // Tengo problemas con esta parte, no puedo conseguir el valor de las crias
+                        if (generoA == true) {
+                            mamifero->amamantando();
+                        }
+                        else {
+                            cout << "\nEl animal no puede amamantar." << endl;
+                        }
+                        break;
+                        
+                        case 3:
+                        a = false;
+                        break;
+
+                        default:
+                        cout << "\nOpci" << Oacento << "n inv" << Aacento << "lida." << endl;
+                    }
+                }
+            }
+            else if (eleccionCrear == 2){
+                bool a = true;
+                while (a == true) // Menú personalizado de la subclase Reptil
+                {
+                    cout << "\n1. Tomar el sol." << endl;
+                    cout << "2. Mudar de piel." << endl;
+                    cout << "3. Regresar al men" << Uacento << "." << endl;
+                    cin >> eleccionReptil;
+
+                    switch (eleccionReptil) {
+                        case 1:
+                        reptil->tomandoSol();
+                        break;
+
+                        case 2:
+                        reptil->mudandoPiel();
+                        break;
+                        
+                        case 3:
+                        a = false; // Se cierra el ciclo
+                        break;
+
+                        default:
+                        cout << "\nOpci" << Oacento << "n inv" << Aacento << "lida." << endl;
+                    }
+                }
+            }
             break;
 
             case 5: // Se cierra el ciclo
@@ -230,5 +295,7 @@ int main (void) {
     }
 
     delete animal;
+    delete reptil;
+    delete mamifero;
     return 0;  
 }
